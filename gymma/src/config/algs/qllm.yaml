@@ -1,0 +1,38 @@
+# --- QMIX specific parameters ---
+
+# use epsilon greedy action selector
+action_selector: "epsilon_greedy"
+epsilon_start: 1.0
+epsilon_finish: 0.05
+epsilon_anneal_time: 200000
+evaluation_epsilon: 0.05
+
+runner: "parallel"
+batch_size_run: 8
+buffer_size: 5000
+t_max: 2000000
+# update the target network every {} episodes
+target_update_interval_or_tau: 0.01
+batch_size: 64
+obs_agent_id: True
+obs_last_action: False
+obs_individual_obs: False
+optimizer: "adam"
+# use the Q_Learner to train
+standardise_returns: False
+standardise_rewards: True
+lr: 0.001
+agent_output_type: "q"
+td_lambda: 0.6
+learner: "q_learner"
+double_q: True
+mixer: "qllm"
+use_rnn: True
+hidden_dim: 128
+LLM_pretrain: False
+maker_num: 3
+LLM_episode: 3
+message_length: 10
+
+
+name: "qllm"
