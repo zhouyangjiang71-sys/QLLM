@@ -1,0 +1,8 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+class QLLMMixer(nn.Module):
+    def __init__(self):
+        super(QLLMMixer, self).__init__()
+    def forward(self, agents_q, global_state):
+        return torch.sum(agents_q, dim=2, keepdim=True)

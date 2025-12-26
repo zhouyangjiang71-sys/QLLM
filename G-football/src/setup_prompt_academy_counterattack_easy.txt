@@ -1,0 +1,20 @@
+This is an offensive soccer game with 11 players on each team. We control only four of our players (i.e., four reinforcement learning agents), while the remaining players on our team and all opponents are controlled by built-in AI.
+The objective of the task is for the agents to coordinate (e.g., passing and positioning) to bring the ball as close as possible to the opponent's goal and eventually score. The coordinates of the opponent's goal are (1.0, 0.0).
+The agents receive rewards consisting of two components: progress reward and goal reward.
+
+The progress reward provides a team reward when one of our agents carries the ball closer to the opponent’s goal. This reward is granted only if one of our players is in possession of the ball and the distance between the ball and the opponent’s goal is less than 0.99 and greater than 0.19. The player in possession is usually the one closest to the ball.
+
+The goal reward provides a team reward when our team successfully scores. In addition to the goal reward, an extra bonus is awarded based on the distance from which the shot was taken—the farther the distance, the higher the bonus.
+
+Each reinforcement learning agent receives a local observation with 115 dimensions:
+0–21: Positions of all our players: 11 players, each with (x, y)
+22–43: Directions of all our players: 11 players, each with (x, y)
+44–65: Positions of all opponent players: 11 players, each with (x, y)
+66–87: Directions of all opponent players: 11 players, each with (x, y)
+88–90: Ball position: (x, y, z)
+91–93: Ball direction: (x, y, z)
+94–96: Ball possession: our team: [0, 1, 0], opponent team: [0, 0, 1], no one in control: [1, 0, 0]
+97–107: An 11-dimensional one-hot encoding indicating the agent’s ID. For example, [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] indicates the agent ID is 1. This ID is used to retrieve the corresponding player's position and direction from the previous information.
+108–114: Invalid information
+
+The global state vector is formed by concatenating the local observations of the four controlled agents, resulting in a total of 460 dimensions.

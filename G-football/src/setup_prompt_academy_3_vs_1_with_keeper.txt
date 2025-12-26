@@ -1,0 +1,18 @@
+This is an offensive soccer game. Our team controls one goalkeeper and three offensive players (a total of four reinforcement learning agents), while the opposing team has one goalkeeper and one defensive player.
+The objective of the task is to score a goal by coordinating the agents (e.g., passing and positioning) to bring the ball as close as possible to the opponent's goal and eventually shoot it into the goal. The coordinates of the opponent's goal are (1.0, 0.0).
+The agents' rewards consist of two components: progress reward and goal reward.
+The progress reward gives a team reward when one of our agents carries the ball closer to the opponent's goal. This reward is granted only when our agent is in possession of the ball and the distance between the ball and the opponent's goal is less than 0.99 and greater than 0.19. The ball carrier is generally the player closest to the ball.
+The goal reward is a team reward given when our team scores a goal. In addition to the goal reward, an extra bonus is provided, which increases with the shooting distance at the time of scoring.
+
+Each agent's local observation has 115 dimensions:
+0–7: Positions of our players: 4 players, each with (x, y)
+8–15: Directions of our players: 4 players, each with (x, y)
+16–19: Positions of opponent players: 2 players, each with (x, y)
+20–23: Directions of opponent players: 2 players, each with (x, y)
+24–87: Invalid information
+88–90: Ball position: (x, y, z)
+91–93: Ball direction: (x, y, z)
+94–96: Ball possession: our team: [0, 1, 0], opponent team: [0, 0, 1], no one in control: [1, 0, 0]
+97–114: Invalid information
+
+The global state vector is formed by concatenating the local observations of the four agents, resulting in a total of 460 dimensions.

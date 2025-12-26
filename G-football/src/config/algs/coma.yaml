@@ -1,0 +1,35 @@
+# --- COMA specific parameters ---
+
+action_selector: "multinomial"
+epsilon_start: .5
+epsilon_finish: .01
+epsilon_anneal_time: 100000
+mask_before_softmax: True
+
+runner: "parallel"
+
+buffer_size: 5000
+batch_size_run: 16
+batch_size: 128
+
+
+# update the target network every {} training steps
+target_update_interval_or_tau: 30
+rnn_hidden_dim: 256
+lr: 0.0005
+critic_lr: 0.0005
+td_lambda: 0.6
+entropy: 0.09
+standardise_returns: False
+standardise_rewards: True
+# use COMA
+agent_output_type: "pi_logits"
+learner: "coma_learner"
+critic_q_fn: "coma"
+critic_baseline_fn: "coma"
+critic_train_mode: "seq"
+critic_train_reps: 1
+entropy_coef: 0.001
+q_nstep: 0  # 0 corresponds to default Q, 1 is r + gamma*Q, etc
+add_value_last_step: True
+name: "coma"

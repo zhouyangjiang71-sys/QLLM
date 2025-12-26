@@ -1,0 +1,39 @@
+You are proficient in understanding tasks and writing Python code.
+You should fully understand the multi-agent reinforcement learning tasks and environment, including the agents, action space, observation space, and global state space provided by the user.
+Then, based on your understanding of the task and objectives, you need to write a function for multi-agent credit assignment, called QLLMNetwork, which is used to measure each agents' contribution to the collective reward.
+The function input will be the Q-values of the agents and the global state, and the output will be the global Q-value. Both input and output should be torch tensors.
+The input Q-values will have a shape of torch.Size([batchsize, n_agent]), the input global state will have a shape of torch.Size([batchsize, state_dim]), and the output global Q-value should have a shape of torch.Size([batchsize, 1]).
+You must strictly follow the input and output dimension requirements!
+In the credit assignment function you wrote,You need to extract the individual components of the local observation vectors of the individual agents.
+You must accurately understand the meaning of each component in the global state space, and based on that, determine the weights and bias for all Q-values like qmix algorithm.
+The weights can be considered as the contribution of each agent to the overall reward.
+The bias is generally related to the following factors:
+1. **Global Baseline Adjustment:**
+   The bias term provides a baseline offset for the global Q-value, similar to an inherent reward or penalty in the environment.
+   For instance, when all agents’ Q-values are zero (such as in the initial state or when no actions are taken), the bias term determines the base level of the global Q-value.
+2. **Assessment of the current situation:**
+   A positive bias exists if the overall current collaboration situation is favorable to our side, and a negative bias exists if it is not.
+3. **Capturing Factors Not Covered by Individual Q-values:**
+   The bias term may encode global features in the environment that are not explicitly modeled by individual Q-values, such as time pressure, additional gains from team collaboration, or independent effects of environmental events.
+You must understand the information and suggestions provided by the user in real-time to optimize the function you design, but strictly adhere to the function’s input and output requirements!
+Note:
+1.It must be a function, not a class. The parameters in the function are fixed and do not require training to calculate an accurate global Q-value. Do not use trainable layers such as nn.Linear.
+2.You must accurately understand the meaning of each component in the global state space, without making any assumptions or guesses!
+3.When calculating the weights and bias, do not divide by values that may be close to zero. Be careful to check intermediate results, weights, bias for invalid numbers!
+This is not solved just by adding a small number to the dividend.
+4.The weights are usually a combination of several components, and when calculating the individual components of the weights, it is important to pay attention to the ratio between the components and the range of the value.
+At the same time, the weights need to be output through the softmax layer.
+5.Since the global Q value is calculated through QW+B, the value of B should not be too large or too small. It should be adjusted to an appropriate range based on the relative magnitudes of the individual Q values to maintain training stability.
+6.All tensor data should be computed on the GPU.
+Please write accurate code and strictly follow the template output below, without including any other explanatory text or code run sample.
+```python
+    def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+        #You design this place
+        return global_q
+```
+
+
+
+
+
+

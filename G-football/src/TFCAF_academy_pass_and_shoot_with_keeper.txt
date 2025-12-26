@@ -1,0 +1,55 @@
+def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+    batch_size = agents_q.size(0)
+    n_agents = agents_q.size(1)
+
+    # Extract agent0's observation components
+    ball_control = global_state[:, 94:97]
+    ball_team = torch.argmax(ball_control, dim=1)
+    ball_x = global_state[:, 88]
+    ball_y = global_state[:, 89]
+
+    # Get player positions from agent0's observation
+    player_pos_x = [global_state[:, 0], global_state[:, 2], global_state[:, 4]]
+    player_pos_y = [global_state[:, 1], global_state[:, 3], global_state[:, 5]]
+
+    # Calculate distances to ball
+    dist_to_ball = torch.stack([
+        torch.sqrt((player_pos_x[i] - ball_x)**2 + (player_pos_y[i] - ball_y)**2)
+        for i in range(3)
+    ], dim=1)
+
+    # Find ball carrier and calculate goal distance
+    ball_carrier = torch.argmin(dist_to_ball, dim=1)
+    goal_dist = torch.sqrt((ball_x - 1.0)**2 + (ball_y - 0.0)**2)
+
+    # Initialize weights tensor
+    weights = torch.zeros_like(agents_q)
+
+    # Calculate weight components
+    for i in range(n_agents):
+        carrier_mask = (ball_carrier == i)
+        our_control_mask = (ball_team == 1)
+
+        # Push reward component
+        push_mask = our_control_mask & (goal_dist > 0.19) & (goal_dist < 0.99)
+        push_val = (0.99 - goal_dist) / 0.8
+        push_val = torch.clamp(push_val, 0, 1) * push_mask
+
+        # Goal reward component
+        goal_mask = our_control_mask & (goal_dist <= 0.19)
+        goal_val = (goal_dist / 0.19) * goal_mask
+
+        # Combine components
+        weights[:, i] = (push_val + goal_val) * carrier_mask.float() + \
+                        our_control_mask.float() * (~carrier_mask).float() * 0.1
+
+    # Handle non-control case
+    weights[ball_team != 1] = 1.0
+
+    # Normalize weights
+    weights = torch.softmax(weights, dim=1)
+
+    # Calculate global Q-value
+    global_q = (agents_q * weights).sum(dim=1, keepdim=True)
+    return global_q
+

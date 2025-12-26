@@ -1,0 +1,12 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
+class QLLMMixer(nn.Module):
+    def __init__(self):
+        super(QLLMMixer, self).__init__()
+    def forward(self, agents_q, global_state):
+        a = agents_q.shape[0]
+        b = agents_q.shape[1]
+        agents_q = agents_q.reshape(-1, agents_q.shape[-1])
+        global_state = global_state.reshape(-1, global_state.shape[-1])

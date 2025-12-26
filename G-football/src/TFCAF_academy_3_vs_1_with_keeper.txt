@@ -1,0 +1,35 @@
+def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+    # Extract ball and possession information from first agent's observation
+    ball_x = global_state[:, 88]
+    ball_y = global_state[:, 89]
+    possession = global_state[:, 94:97]
+    holder_my_team = global_state[:, 97:101]
+
+    # Calculate ball distance to opponent goal
+    ball_goal_dist = torch.sqrt((ball_x - 1.0)**2 + ball_y**2)
+    my_team_has_ball = torch.argmax(possession, dim=1) == 0
+    in_push_region = (ball_goal_dist > 0.19) & (ball_goal_dist < 0.99) & my_team_has_ball
+
+    # Calculate agent distances to goal and ball
+    agent_x = global_state[:, [0,2,4,6]]
+    agent_y = global_state[:, [1,3,5,7]]
+    agent_goal_dist = torch.sqrt((agent_x - 1.0)**2 + agent_y**2)
+    agent_ball_dist = torch.sqrt((agent_x - ball_x.unsqueeze(1))**2 + (agent_y - ball_y.unsqueeze(1))**2)
+
+    # Calculate weights components
+    holder_weights = (1.0 - ball_goal_dist).unsqueeze(1) * holder_my_team * in_push_region.unsqueeze(1) * 10.0
+    non_push_weights = holder_my_team * my_team_has_ball.unsqueeze(1) * (~in_push_region).unsqueeze(1)
+    support_weights = (1.0 / (1.0 + agent_goal_dist)) * (~holder_my_team.bool()) * my_team_has_ball.unsqueeze(1)
+    defense_weights = (1.0 / (1.0 + agent_ball_dist)) * (~my_team_has_ball).unsqueeze(1)
+
+    # Combine weights and normalize
+    weights = holder_weights + non_push_weights + support_weights + defense_weights
+    weights = torch.softmax(weights, dim=1)
+
+    # Calculate global Q-value
+    global_q = (agents_q * weights).sum(dim=1, keepdim=True)
+    return global_q
+
+
+
+
