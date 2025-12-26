@@ -1,0 +1,13 @@
+In this environment, there is 1 adversary, 2 good agents, 2 landmarks.
+All agents observe the position of 2 landmarks and other agents. One of these 2 landmarks is the 'target landmark'.
+Good agents are rewarded based on how close the closest one of them is to the target landmark, but negatively rewarded based on how close the adversary is to the target landmark.
+The adversary want to get closer to the target landmark based on the agents' behavior, but it doesn't know which landmark is the target landmark.
+This means good agents have to learn to 'split up' and cover all landmarks to deceive the adversary.
+OBSERVATION FORM: At each step, each agent receives an observation array.
+This observation is represented by an array with 8 dimensions:
+concat([target landmark's relative locations, 2 landmarks' relative locations, other agent's relative locations]).
+The target landmark's relative locations are 1x2 dimensions, including relative x and y coordinates(target_landmark.x-agent.x, target_landmark.y-agent.y).
+The 2 landmarks'(including target landmark) relative locations are 2x2 dimensions, including relative x and y coordinates(landmark_i.x-agent.x, landmark_i.y-agent.y).
+The other creatures'(including adversary and the rest of the agents) relative locations are 2x2 dimensions, including relative x and y coordinates(other_creature_i.x-agent.x, other_creature_i.y-agent.y).
+The global state space is concatenate together from the observation space of the 2 agents, which are 8x2 dimensions.
+Agent action space: [no_action, move_left, move_right, move_down, move_up]

@@ -1,0 +1,19 @@
+def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+    batch_size = agents_q.shape[0]
+    contributions = []
+
+    for i in range(2):
+        tx = global_state[:, i*8]
+        ty = global_state[:, i*8+1]
+        adv_rel_x = global_state[:, i*8+6]
+        adv_rel_y = global_state[:, i*8+7]
+
+        agent_dist = torch.sqrt(tx**2 + ty**2).clamp(min=0.1)
+        adv_to_target = torch.sqrt((tx - adv_rel_x)**2 + (ty - adv_rel_y)**2).clamp(max=5.0)
+
+        contrib = adv_to_target / agent_dist
+        contributions.append(contrib.unsqueeze(1))
+
+    weights = torch.softmax(torch.cat(contributions, dim=1), dim=1)
+    global_q = torch.sum(agents_q * weights, dim=1, keepdim=True)
+    return global_q

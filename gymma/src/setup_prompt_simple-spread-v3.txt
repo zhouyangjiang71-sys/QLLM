@@ -1,0 +1,14 @@
+We are playing Cooperative Navigation. In this task, 6 agents are asked to reach 6 landmarks.
+Each agent should move to get close to one landmark and avoid collision(distance<=0.3) with other agents.
+The agent-team are rewarded based on how far the closest agent is to each landmark (the reward equals the negative value of the sum of the minimum distances).
+At the same time, the agent-team are penalized if they collide each other (-1 for each collision).
+At each step, each agent receives an observation array.
+This observation is represented by an array with 36 dimensions:
+concat([agent's velocity, agent's location, 6 landmarks' relative locations, 5 other agents' relative locations, communication code]).
+The agent's velocity is 2-dimensional, including x and y components.
+The agent's location is 2-dimensional, including x and y coordinates.
+The landmarks' relative locations are 6x2 dimensions, including relative x and y coordinates(landmark_i.x-agent.x, landmark_i.y-agent.y).
+The other agents' relative locations are 5x2 dimensions, including relative x and y coordinates(agent_i.x-agent.x, agent_i.y-agent.y).
+The communication code are 10 dimensions, they have no role in credit assignment.
+The global state space is concatenate together from the observation space of the three agents, which are 36x6 dimensions.
+Agent action space: [no_action, move_left, move_right, move_down, move_up]

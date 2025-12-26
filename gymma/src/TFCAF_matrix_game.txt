@@ -1,0 +1,38 @@
+def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+    device = agents_q.device
+    batch_size = agents_q.shape[0]
+
+    # Initialize default weights for all batch samples
+    weights = torch.full((batch_size, 2), 0.5, device=device)
+
+    # Create reward matrix tensor
+    reward_matrix = torch.tensor([[11, -30, 0], [-30, 7, 0], [0, 6, 5]], dtype=torch.float32, device=device)
+
+    # Create mask for valid previous actions (excluding initial [-1,-1] state)
+    valid_mask = (global_state[:, 0] >= 0) & (global_state[:, 1] >= 0)
+
+    if valid_mask.any():
+        # Convert global_state to long tensor for indexing
+        prev_actions = global_state[valid_mask].long()
+
+        # Calculate previous joint reward
+        prev_rewards = reward_matrix[prev_actions[:, 0], prev_actions[:, 1]]
+
+        # Calculate agent 0's contribution (row agent)
+        agent0_avg = reward_matrix[:, prev_actions[:, 1]].mean(dim=0)
+        agent0_contrib = prev_rewards - agent0_avg
+
+        # Calculate agent 1's contribution (column agent)
+        agent1_avg = reward_matrix[prev_actions[:, 0], :].mean(dim=1)
+        agent1_contrib = prev_rewards - agent1_avg
+
+        # Combine contributions and apply softmax
+        combined_contrib = torch.stack([agent0_contrib, agent1_contrib], dim=1)
+        batch_weights = torch.softmax(combined_contrib, dim=1)
+
+        # Update weights for valid samples
+        weights[valid_mask] = batch_weights
+
+    # Compute weighted global Q-value
+    global_q = (agents_q * weights).sum(dim=1, keepdim=True)
+    return global_q

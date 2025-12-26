@@ -1,0 +1,37 @@
+def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+    batch_size = agents_q.size(0)
+    n_agents = 4
+    agents = global_state[:, :12].view(batch_size, n_agents, 3)
+    agents_x, agents_y, agents_level = agents[:, :, 0], agents[:, :, 1], agents[:, :, 2]
+
+    foods = global_state[:, 12:21].view(batch_size, 3, 3)
+    foods_x, foods_y, foods_level = foods[:, :, 0], foods[:, :, 1], foods[:, :, 2]
+    active_foods = (foods_x != -1) & (foods_y != -1)
+
+    last_actions = global_state[:, 21:25]
+    sum_adjacent = torch.zeros_like(agents_x)
+
+    for j in range(3):
+        food_active = active_foods[:, j]
+        food_x_col = foods_x[:, j]
+        food_y_col = foods_y[:, j]
+        food_level_col = foods_level[:, j]
+
+        dx = torch.abs(agents_x - food_x_col.unsqueeze(1))
+        dy = torch.abs(agents_y - food_y_col.unsqueeze(1))
+        adjacent = (dx + dy == 1).float()
+
+        contrib = food_level_col.unsqueeze(1) * adjacent * food_active.unsqueeze(1).float()
+        sum_adjacent += contrib
+
+    action_mask = (last_actions == 5).float()
+    weights = agents_level * sum_adjacent * action_mask
+
+    sum_weights = weights.sum(dim=1, keepdim=True)
+    mask = (sum_weights == 0).float()
+    normalized = weights / (sum_weights + 1e-8)
+    equal_weights = torch.ones_like(weights) / n_agents
+    final_weights = normalized * (1 - mask) + equal_weights * mask
+
+    global_q = (agents_q * final_weights).sum(dim=1, keepdim=True)
+    return global_q

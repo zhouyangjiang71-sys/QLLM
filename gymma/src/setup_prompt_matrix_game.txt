@@ -1,0 +1,9 @@
+This task is a two-player cooperative matrix game with a given 3×3 matrix:
+[[11, -30, 0], [-30, 7, 0], [0, 6, 5]]
+The environment consists of two agents, agent_0 and agent_1, each having three possible actions(0,1,2) corresponding to the row and column indices of the matrix.
+Once both agents select their actions, they receive a shared reward determined by the corresponding entry in the matrix.
+There is no communication between the two agents, and the objective is to maximize the shared reward.
+Be sure to prevent the strategy from falling into a local optimum, and only get the highest reward if both intelligences choose action 0.
+The state vector is 2 dims, storing the actions that the two agents have just executed.
+At the first step at the beginning of an episode, the state vector is [-1,-1], because the agents have not yet started executing actions.
+Please take care to handle this special case.

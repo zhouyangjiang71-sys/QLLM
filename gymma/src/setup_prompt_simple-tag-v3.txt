@@ -1,0 +1,15 @@
+We are playing Predator Prey. In this task, 3 agents should cooperate to catch 1 prey.
+Agents should move to get closer to one of the preys to catch it(distance<0.125).
+Prey is faster and try to get out of the agents' clutches as best he can.
+Agents are slower and are rewarded for hitting preys (+10 for each collision). Obstacles will block the way, but there will be no negative rewards.
+OBSERVATION FORM: At each step, each agent receives an observation array.
+This observation is represented by an array with 16 dimensions:
+concat([agent's velocity, agent's location, 2 obstacles' relative locations, 2 other agents' relative locations, 1 prey's relative locations, 1 prey's velocity]).
+The agent's velocity is 2-dimensional, including x and y components.
+The agent's location is 2-dimensional, including x and y coordinates.
+The 2 obstacles' relative locations are 2x2 dimensions, including relative x and y coordinates(obstacle_i.x-agent.x, obstacle_i.y-agent.y).
+The 2 other agents' relative locations are 2x2 dimensions, including relative x and y coordinates(agent_i.x-agent.x, agent_i.y-agent.y).
+The preys' relative locations are 1x2-dimensional, including relative x and y coordinates(prey_i.x-agent.x, prey_i.y-agent.y).
+The preys' velocity is 1x2-dimensional, including x and y components.
+The global state space is concatenate together from the observation space of the 3 agents, which are 16x3 dimensions.
+Agent action space: [no_action, move_left, move_right, move_down, move_up]

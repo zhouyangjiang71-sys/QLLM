@@ -1,0 +1,21 @@
+def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+    agent_obs = global_state.view(-1, 3, 16)
+    dx = torch.clamp(agent_obs[:, :, 12], min=-5.0, max=5.0)
+    dy = torch.clamp(agent_obs[:, :, 13], min=-5.0, max=5.0)
+    vx = torch.clamp(agent_obs[:, :, 0], min=-3.0, max=3.0)
+    vy = torch.clamp(agent_obs[:, :, 1], min=-3.0, max=3.0)
+
+    distance = torch.sqrt(dx**2 + dy**2 + 1e-5)
+    proximity = 1.0 / (1.0 + distance)
+
+    v_dot_d = vx * dx + vy * dy
+    velocity_mag = torch.sqrt(vx**2 + vy**2 + 1e-5)
+    alignment = v_dot_d / (velocity_mag * distance + 1e-5)
+    alignment = torch.clamp(alignment, -1.0, 1.0)
+    alignment_score = torch.relu(alignment)
+
+    scores = proximity * alignment_score
+    weights = torch.softmax(scores, dim=1)
+    global_q = (agents_q * weights).sum(dim=1, keepdim=True)
+
+    return global_q

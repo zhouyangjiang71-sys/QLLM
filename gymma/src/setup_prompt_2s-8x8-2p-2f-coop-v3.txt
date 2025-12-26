@@ -1,0 +1,35 @@
+The Level-Based Foraging environment focus on the coordination of involved agents.
+The task for each agent is to navigate the grid-world map and collect items.
+Each agent and food item is assigned a level and food items are randomly scattered in the environment.
+In order to collect a food item, agents have to choose a pick-up action next to the food item.
+However, such collection is only successful if 2 agents participate in the pickup at the same time.
+At the same time the agents involved in the pickup must be one square above, below, left and right of the food item.
+Agents receive team reward equal to the level of the collected food item.
+In each step, every agent can choose to act by moving in one of four directions or attempt to pick up a food item.
+The task is an 8*8 grid-world with 2 agents and 2 food items scattered in the grid.
+Below, we will provide additional details to global states, actions and rewards for the Level-Based Foraging environment.
+States:
+Global state vector consists of 3 component(agents component,food items component and last step action)(Total dimension: 2x3+2x3+2=14 dims)
+1.Agents Component (2 agents × 3 features = 6 dims)
+Feature 0: agent_i's x coordinate (i=0,1)
+Feature 1: agent_i's y coordinate
+Feature 2: agent_i's level
+2.Food Items Component (2 Food Items × 3 features = 6 dims)
+Feature 0: food_item_i's x coordinate
+Feature 1: food_item_i's y coordinate
+Feature 2: food_item_i's level
+When a food item has been picked up, then the respective values are replaced with (-1, -1, 0).You have to be careful to handle this particular situation properly.
+3.The actions just executed by the agents. (2 dims)
+{0,1,2...5} respectively represent {Noop, Move North, Move South, Move West, Move East, Pickup}
+This information is set to [-1 -1] when the environment is in the first step of each episode.
+Actions:
+In Level-Based Foraging environments, each agent has six possible discrete actions to choose at each timestep:
+Ai = {Noop, Move North, Move South, Move West, Move East, Pickup}
+While the first action corresponds to the action simply staying within its grid and the last action being used to pickup nearby food,
+the remaining four actions encode discrete 2D navigation.
+Upon choosing these actions, the agent moves a single cell in the chosen direction within the grid.
+Picking up is only valid if the sum of the levels of the agents doing the picking up action is greater than or equal to the level of the food.
+At the same time, the agents involved in the pickup must be positioned one cell above, below, to the left, or to the right of the food.
+Reward:
+Agents only receive non-zero team reward for picking up food items within the Level-Based Foraging environment.
+The reward for picking up a food item equals to the food level.

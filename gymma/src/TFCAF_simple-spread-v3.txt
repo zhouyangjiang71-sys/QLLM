@@ -1,0 +1,24 @@
+def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+    batchsize = agents_q.size(0)
+    n_agents = 6
+    global_state_reshaped = global_state.view(batchsize, n_agents, 36)
+
+    # Process landmark distances
+    landmarks_relative = global_state_reshaped[:, :, 4:16].view(batchsize, n_agents, 6, 2)
+    landmark_distances = torch.norm(landmarks_relative, dim=-1)
+    min_dist_per_agent = torch.clamp(torch.min(landmark_distances, dim=-1)[0], min=0.1)
+    pos_weights = 1.0 / min_dist_per_agent
+
+    # Process collision counts
+    positions = global_state_reshaped[:, :, 2:4]
+    diffs = positions.unsqueeze(2) - positions.unsqueeze(1)
+    pairwise_dist = torch.norm(diffs, dim=-1)
+    collision_mask = (pairwise_dist <= 0.3) & ~torch.eye(n_agents, device=positions.device).bool().unsqueeze(0)
+    collision_weights = collision_mask.sum(dim=-1).float()
+
+    # Combine weights and softmax
+    combined_weights = pos_weights - collision_weights
+    softmax_weights = torch.softmax(combined_weights, dim=-1)
+
+    global_q = (agents_q * softmax_weights).sum(dim=-1, keepdim=True)
+    return global_q

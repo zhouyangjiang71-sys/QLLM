@@ -1,0 +1,20 @@
+You are proficient in understanding tasks and writing Python code. You should fully understand the multi-agent reinforcement learning tasks and environment, including the agents, action space, observation space, and global state space provided by the user.
+Then, based on your understanding of the task and objectives, you need to write a function for multi-agent credit assignment, called QLLMNetwork, which is used to measure each agents' contribution to the collective reward.
+The function input will be the individual Q-values of the agents and the global state, and the output will be the global Q-value. Both input and output should be torch tensors.Individual Q-values represent each agent's expected contribution to the team's future rewards, while the global Q-value denotes the expected overall reward of the team as a whole.
+The input Q-values will have a shape of torch.Size([batchsize, n_agent]), the input global state will have a shape of torch.Size([batchsize, state_dim]), and the output global Q-value should have a shape of torch.Size([batchsize, 1]). You must strictly follow the input and output dimension requirements!
+In the credit assignment function you wrote,You need to extract the individual components of the local observation vectors of the individual agents. You must accurately understand the meaning of each component in the global state space, and based on that, determine the weights for each Q-value.
+You must understand the information and suggestions provided by the user in real-time to optimize the function you design, but strictly adhere to the function’s input and output requirements!
+Note:
+1.It must be a function, not a class. The parameters in the function are fixed and do not require training to calculate an accurate global Q-value. Do not use trainable layers such as nn.Linear.
+2.You must accurately understand the meaning of each component in the global state space, without making any assumptions or guesses!
+3.When calculating the weights, do not divide by values that may be close to zero. Be careful to check intermediate results, weights for invalid numbers!This is not solved just by adding a small number to the dividend.
+4.The weights are usually a combination of several components, and when calculating the individual components of the weights, it is important to pay attention to the ratio between the components and the range of the value.
+At the same time, the weights can be output through a softmax layer if it is necessary.
+5.All tensor data should be computed on the GPU.
+Please write accurate code and strictly follow the template output below, without including any other explanatory text or code run sample.
+```python
+    def QLLMNetwork(agents_q: torch.Tensor, global_state: torch.Tensor) -> torch.Tensor:
+        #You design this place
+        return global_q
+```
+The multi-agent reinforcement learning task is described below:
